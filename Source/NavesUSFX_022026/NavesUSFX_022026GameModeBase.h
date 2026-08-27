@@ -34,6 +34,13 @@ protected:
 	AEnemigo* CrearEnemigo(TSubclassOf<AEnemigo> ClaseEnemigo, int32 NumeroCuadrilla,
 		const FVector& Centro, float SegundosDeVida);
 
+	/**
+	 * Sortea cuantos segundos vive un enemigo antes de desaparecer.
+	 * Al ser aleatorio, el orden en que se retiran los miembros de la
+	 * cuadrilla 1 cambia en cada partida.
+	 */
+	float SortearTiempoDeVida() const;
+
 	void PrepararEscenario();
 	void CrearPlano(const FVector& Posicion, const FVector& Escala, const FLinearColor& Color, bool bSolido);
 	void ColocarJugador();
@@ -52,6 +59,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Cuadrillas")
 	FVector CentroCuadrillaDos;
+
+	/** Extremos del rango del que se sortea el tiempo de vida, en segundos. */
+	UPROPERTY(EditAnywhere, Category = "Cuadrillas")
+	float VidaMinima;
+
+	UPROPERTY(EditAnywhere, Category = "Cuadrillas")
+	float VidaMaxima;
 
 	FTimerHandle TemporizadorVigilancia;
 	FTimerHandle TemporizadorJugador;

@@ -106,7 +106,7 @@ void AEnemigo::BeginPlay()
 			&AEnemigo::Desaparecer, SegundosDeVida, false);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Cuadrilla %d] %s en escena, desaparece en %.0f s"),
+	UE_LOG(LogTemp, Warning, TEXT("[Cuadrilla %d] %s en escena, desaparece en %.1f s"),
 		Cuadrilla, *Tipo, SegundosDeVida);
 }
 
@@ -158,7 +158,7 @@ void AEnemigo::Desaparecer()
 			FString::Printf(TEXT("Cuadrilla %d  ->  %s desaparece"), Cuadrilla, *Tipo));
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Cuadrilla %d] %s DESAPARECE (FTimerHandle a los %.0f s)"),
+	UE_LOG(LogTemp, Warning, TEXT("[Cuadrilla %d] %s DESAPARECE (FTimerHandle a los %.1f s)"),
 		Cuadrilla, *Tipo, SegundosDeVida);
 
 	GetWorldTimerManager().ClearTimer(TemporizadorDesaparicion);

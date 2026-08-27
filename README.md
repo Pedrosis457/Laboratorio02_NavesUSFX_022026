@@ -78,7 +78,7 @@ escala, color, velocidad y altura. Por eso todas se distinguen a simple vista.
 |---|---|---|
 | Centro de operaciones | `X = -3000` | `X = +3000` |
 | Miembros | EAHelicoptero, EAAvion, ETSoldado, ETTanque, EABarco | EADron, ETCamion, ETBlindado, EALancha, EAMotoAcuatica |
-| Tiempo de vida | 10, 14, 18, 22 y 26 s | Permanente |
+| Tiempo de vida | **Aleatorio**, entre 6 y 22 s | Permanente |
 
 **Se mueven independientemente** porque cada cuadrilla opera en su propia mitad
 del escenario: al configurar un enemigo se le pasa el centro de su cuadrilla, y
@@ -104,8 +104,35 @@ if (SegundosDeVida > 0.0f)
 }
 ```
 
-Como los tiempos están escalonados (10, 14, 18, 22, 26 s), los miembros de la
-cuadrilla 1 **van desapareciendo uno por uno**, no todos de golpe.
+### El tiempo de vida es aleatorio
+
+A cada miembro de la cuadrilla 1 se le **sortea** su tiempo de vida al momento de
+crearlo, dentro de un rango configurable:
+
+```cpp
+float ANavesUSFX_022026GameModeBase::SortearTiempoDeVida() const
+{
+    return FMath::FRandRange(VidaMinima, VidaMaxima);   // 6 a 22 segundos
+}
+```
+
+`FRandRange` con decimales devuelve cualquier valor del intervalo, así que
+**cada partida reparte tiempos distintos**. El orden en que se retiran los
+enemigos cambia en cada ejecución, y la duración total del ciclo también.
+
+Dos ejecuciones reales, tomadas del log:
+
+```
+Partida 1:  tanque 6.6  →  helicoptero 6.9  →  avion 12.1  →  soldado 16.7  →  barco 21.8
+Partida 2:  soldado 9.2  →  avion 12.5  →  tanque 17.5  →  barco 18.7  →  helicoptero 19.5
+```
+
+Que el orden sea impredecible no afecta la regla de la segunda cuadrilla: la
+vigilancia no mira tiempos, mira **cuántos quedan vivos**. Da igual quién se
+vaya primero — la cuadrilla 2 entra cuando el contador llega a cero.
+
+`VidaMinima` y `VidaMaxima` son `UPROPERTY(EditAnywhere)`, así que el rango se
+puede cambiar desde el editor sin recompilar.
 
 ## 6. Cómo entra la cuadrilla 2
 
@@ -154,7 +181,7 @@ código, así que no hay que configurar nada en el editor.
 ### Qué se ve
 
 - **0 s** — Aparece la cuadrilla 1 a la izquierda: 5 enemigos de las tres familias
-- **10 a 26 s** — Van desapareciendo uno por uno, con aviso naranja en pantalla
+- **6 a 22 s** — Van desapareciendo uno por uno en orden aleatorio, con aviso naranja en pantalla
 - **Al llegar a 0** — Aparece la cuadrilla 2 a la derecha con sus 5 miembros
 
 ## 9. Estructura del código

@@ -35,7 +35,18 @@ ANavesUSFX_022026GameModeBase::ANavesUSFX_022026GameModeBase()
 	CentroCuadrillaUno = FVector(-3000.0f, 0.0f, 0.0f);
 	CentroCuadrillaDos = FVector(3000.0f, 0.0f, 0.0f);
 
+	// Rango del sorteo del tiempo de vida de la cuadrilla 1.
+	VidaMinima = 6.0f;
+	VidaMaxima = 22.0f;
+
 	bCuadrillaDosDesplegada = false;
+}
+
+float ANavesUSFX_022026GameModeBase::SortearTiempoDeVida() const
+{
+	// FRandRange con decimales: devuelve un valor cualquiera del intervalo,
+	// asi que cada partida reparte tiempos distintos.
+	return FMath::FRandRange(VidaMinima, VidaMaxima);
 }
 
 void ANavesUSFX_022026GameModeBase::BeginPlay()
@@ -69,13 +80,14 @@ void ANavesUSFX_022026GameModeBase::DesplegarCuadrillaUno()
 {
 	CuadrillaUno.Empty();
 
-	// Tiempos de vida escalonados: van desapareciendo uno por uno,
-	// cada uno por su propio FTimerHandle.
-	CuadrillaUno.Add(CrearEnemigo(AEAHelicoptero::StaticClass(), 1, CentroCuadrillaUno, 10.0f));
-	CuadrillaUno.Add(CrearEnemigo(AEAAvion::StaticClass(),       1, CentroCuadrillaUno, 14.0f));
-	CuadrillaUno.Add(CrearEnemigo(AETSoldado::StaticClass(),     1, CentroCuadrillaUno, 18.0f));
-	CuadrillaUno.Add(CrearEnemigo(AETTanque::StaticClass(),      1, CentroCuadrillaUno, 22.0f));
-	CuadrillaUno.Add(CrearEnemigo(AEABarco::StaticClass(),       1, CentroCuadrillaUno, 26.0f));
+	// A cada miembro se le sortea su tiempo de vida: el orden en que se
+	// retiran cambia en cada partida. Cada uno lo administra con su propio
+	// objeto FTimerHandle.
+	CuadrillaUno.Add(CrearEnemigo(AEAHelicoptero::StaticClass(), 1, CentroCuadrillaUno, SortearTiempoDeVida()));
+	CuadrillaUno.Add(CrearEnemigo(AEAAvion::StaticClass(),       1, CentroCuadrillaUno, SortearTiempoDeVida()));
+	CuadrillaUno.Add(CrearEnemigo(AETSoldado::StaticClass(),     1, CentroCuadrillaUno, SortearTiempoDeVida()));
+	CuadrillaUno.Add(CrearEnemigo(AETTanque::StaticClass(),      1, CentroCuadrillaUno, SortearTiempoDeVida()));
+	CuadrillaUno.Add(CrearEnemigo(AEABarco::StaticClass(),       1, CentroCuadrillaUno, SortearTiempoDeVida()));
 
 	CuadrillaUno.RemoveAll([](AEnemigo* Enemigo) { return Enemigo == nullptr; });
 
